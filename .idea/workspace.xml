@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="086d59f1-ee11-4c32-a388-e04a5ab79c76" name="变更" comment="这是初始的提交内容22" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2SltwQ8cr7cv10LNEQIRHdA8fCg" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "true",
+    "WebServerToolWindowPanel.toolwindow.highlight.mappings": "true",
+    "WebServerToolWindowPanel.toolwindow.highlight.symlinks": "true",
+    "WebServerToolWindowPanel.toolwindow.show.date": "false",
+    "WebServerToolWindowPanel.toolwindow.show.permissions": "false",
+    "WebServerToolWindowPanel.toolwindow.show.size": "false",
+    "last_opened_file_path": "F:/hyperspectralSR",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="F:\hyperspectralSR" />
+      <recent name="F:\EFGN2\mcodes\predataset" />
+      <recent name="F:\EFDN2" />
+      <recent name="D:\all codes\hyperspectualimageSR\CEGATSR-main\inferimg\Harvard_x4\bicubic" />
+      <recent name="D:\all codes\hyperspectualimageSR\CEGATSR-main\inferimg\Harvard_x4\msdformer" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\all codes\hyperspectualimageSR\CEGATSR-main\inferimg\Chikusei_x4" />
+      <recent name="D:\all codes\hyperspectualimageSR\CEGATSR-main\inferimg\Chikusei_x8\zuizhongmodel" />
+      <recent name="D:\all codes\hyperspectualimageSR\CEGATSR-main\datasettest" />
+      <recent name="D:\all codes\hyperspectualimageSR\CEGATSR-main\fakergb" />
+      <recent name="D:\all codes\hyperspectualimageSR\CEGATSR-main\oldexp" />
+    </key>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="应用程序级" UseSingleDictionary="true" transferred="true" />
+  <component name="SvnConfiguration">
+    <configuration>C:\Users\zhangmj\AppData\Roaming\Subversion</configuration>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="默认任务">
+      <changelist id="086d59f1-ee11-4c32-a388-e04a5ab79c76" name="变更" comment="" />
+      <created>1689733232688</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1689733232688</updated>
+      <workItem from="1689733234324" duration="8121000" />
+      <workItem from="1690423356354" duration="9154000" />
+      <workItem from="1691647908647" duration="2452000" />
+      <workItem from="1691977721823" duration="16115000" />
+      <workItem from="1692083845538" duration="1382000" />
+      <workItem from="1692149542300" duration="29556000" />
+      <workItem from="1693553876978" duration="13279000" />
+      <workItem from="1693644974465" duration="98000" />
+      <workItem from="1693790605060" duration="24791000" />
+      <workItem from="1693895348078" duration="3278000" />
+      <workItem from="1693898811134" duration="4789000" />
+      <workItem from="1693904612296" duration="10293000" />
+      <workItem from="1694051865698" duration="15414000" />
+      <workItem from="1694080176369" duration="33903000" />
+      <workItem from="1694420568800" duration="974000" />
+      <workItem from="1694482748767" duration="13493000" />
+      <workItem from="1694573921364" duration="667000" />
+      <workItem from="1694585425126" duration="6454000" />
+      <workItem from="1694654494422" duration="25812000" />
+      <workItem from="1695001960042" duration="18457000" />
+      <workItem from="1695201592509" duration="642000" />
+      <workItem from="1695202535708" duration="26174000" />
+      <workItem from="1695606548200" duration="5876000" />
+      <workItem from="1695695561599" duration="18911000" />
+      <workItem from="1696642610696" duration="13139000" />
+      <workItem from="1696669797966" duration="48075000" />
+      <workItem from="1697075180719" duration="11499000" />
+      <workItem from="1697426008354" duration="107670000" />
+      <workItem from="1698371212200" duration="17858000" />
+      <workItem from="1698631421009" duration="94074000" />
+      <workItem from="1699321172435" duration="42378000" />
+      <workItem from="1699925969518" duration="40808000" />
+      <workItem from="1700292732132" duration="64207000" />
+      <workItem from="1701050472267" duration="35758000" />
+      <workItem from="1701252204086" duration="2581000" />
+      <workItem from="1701318822960" duration="18337000" />
+      <workItem from="1701574739636" duration="1834000" />
+      <workItem from="1701756567058" duration="40998000" />
+      <workItem from="1702259463648" duration="3366000" />
+      <workItem from="1702345915752" duration="43332000" />
+      <workItem from="1702863572386" duration="91667000" />
+      <workItem from="1703910151445" duration="5186000" />
+      <workItem from="1703916032174" duration="2987000" />
+      <workItem from="1703937090918" duration="187000" />
+      <workItem from="1703938620215" duration="1489000" />
+      <workItem from="1704161336237" duration="72667000" />
+      <workItem from="1705025079750" duration="1000" />
+      <workItem from="1705025153476" duration="20228000" />
+      <workItem from="1705371993877" duration="39751000" />
+      <workItem from="1705915965774" duration="45791000" />
+      <workItem from="1707286559127" duration="7578000" />
+      <workItem from="1708090316553" duration="62296000" />
+      <workItem from="1708913516767" duration="33729000" />
+      <workItem from="1709215187929" duration="14978000" />
+      <workItem from="1709344813436" duration="20910000" />
+      <workItem from="1709604349114" duration="17000" />
+      <workItem from="1709604403429" duration="14403000" />
+      <workItem from="1709632009301" duration="116474000" />
+      <workItem from="1710572977509" duration="56181000" />
+      <workItem from="1710918191531" duration="15408000" />
+      <workItem from="1710985170294" duration="41138000" />
+      <workItem from="1711934503834" duration="41736000" />
+      <workItem from="1712452305167" duration="2084000" />
+      <workItem from="1712454593047" duration="48601000" />
+      <workItem from="1712799216284" duration="20642000" />
+      <workItem from="1712885617035" duration="114540000" />
+      <workItem from="1713750087564" duration="106784000" />
+      <workItem from="1715396932836" duration="28511000" />
+      <workItem from="1715822600703" duration="15368000" />
+      <workItem from="1716033172728" duration="36648000" />
+      <workItem from="1716457064071" duration="74201000" />
+      <workItem from="1717726235970" duration="30697000" />
+      <workItem from="1718590053508" duration="33850000" />
+      <workItem from="1719477143588" duration="90919000" />
+      <workItem from="1720776023494" duration="37047000" />
+      <workItem from="1721615270831" duration="44938000" />
+      <workItem from="1721980802976" duration="79003000" />
+      <workItem from="1722839508292" duration="41118000" />
+      <workItem from="1724762495076" duration="1015000" />
+      <workItem from="1724766383141" duration="776000" />
+      <workItem from="1724772722831" duration="1071000" />
+      <workItem from="1724773954818" duration="10000" />
+      <workItem from="1724774853032" duration="86000" />
+      <workItem from="1724775130382" duration="428000" />
+      <workItem from="1748438586032" duration="374000" />
+    </task>
+    <task id="LOCAL-00001" summary="这是初始的提交内容">
+      <created>1703912974563</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1703912974563</updated>
+    </task>
+    <task id="LOCAL-00002" summary="这是初始的提交内容">
+      <created>1703913962532</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1703913962532</updated>
+    </task>
+    <task id="LOCAL-00003" summary="这是初始的提交内容2">
+      <created>1703914292233</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1703914292233</updated>
+    </task>
+    <task id="LOCAL-00004" summary="这是初始的提交内容2">
+      <created>1703915945623</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1703915945623</updated>
+    </task>
+    <task id="LOCAL-00005" summary="这是初始的提交内容2">
+      <created>1703915971873</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1703915971873</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="CUSTOM_BOOLEAN_PROPERTIES">
+                <map>
+                  <entry key="Show.Git.Branches" value="true" />
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="这是初始的提交内容" />
+    <MESSAGE value="这是初始的提交内容2" />
+    <option name="LAST_COMMIT_MESSAGE" value="这是初始的提交内容2" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/CEGATSR_main$CEGATSR3.coverage" NAME="CEGATSR3 覆盖结果" MODIFIED="1695354425403" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CEGATSR_main$mains.coverage" NAME="mains 覆盖结果" MODIFIED="1693900649728" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CEGATSR_main$mains2.coverage" NAME="mains2 覆盖结果" MODIFIED="1693816213960" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CEGATSR_main$huatu.coverage" NAME="huatu 覆盖结果" MODIFIED="1697011162237" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CEGATSR_main$keshihua.coverage" NAME="keshihua 覆盖结果" MODIFIED="1695451978616" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+  </component>
+</project>
