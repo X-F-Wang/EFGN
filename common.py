@@ -32,17 +32,9 @@ def default_conv(in_channels, out_channels, kernel_size, bias=True, dilation=1):
             padding=3, bias=bias, dilation=dilation)
 
 
-# 这是扩张卷积
-def default_conv2(in_channels, out_channels, kernel_size, stride=1, bias=True, dilation=1):
-    if dilation==1:
-       return nn.Conv2d(
-           in_channels, out_channels, kernel_size,
-           padding=(kernel_size//2), bias=bias)
-    elif dilation==2:
-       return nn.Conv2d(
-           in_channels, out_channels, kernel_size,
-           padding=2, bias=bias, dilation=dilation)
-    else:
+
+def default_conv2(in_channels, out_channels, kernel_size, stride=1, bias=True, dilation=k):
+
        padding = int((kernel_size - 1) / 2) * dilation
        return nn.Conv2d(
            in_channels, out_channels, kernel_size,

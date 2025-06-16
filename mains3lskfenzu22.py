@@ -220,7 +220,7 @@ def train(args):
             save_checkpoint(args, net, e + 1)
 
     # save model after training
-    # 感觉是多了下面这一行网络才不一样
+
     net.eval().cpu()
     save_model_filename = model_title + "_epoch_" + str(args.epochs) + "_" + \
                           str(time.ctime()).replace(' ', '_') + ".pth"
@@ -266,16 +266,13 @@ def train(args):
         for index in indices:
             indices[index] = indices[index] / test_number
 
-    # save_dir = "/data/test.npy"
-    # save_dir = model_title + '.npy'     # '/home/zhangmj/hyperspectralSR/CEGATSR/data/test/' + model_title + '.npy'
-    # save_dir = '/home/zhangmj/hyperspectralSR/CEGATSR/test_log/' + model_title + '.npy'
-    save_dir = '/home/zhangmj/hyperspectralSR/CEGATSR/shiyan_log/' + model_title + '.npy'
+    save_dir = '/home/hyperspectralSR/CEGATSR/shiyan_log/' + model_title + '.npy'
     np.save(save_dir, output)
     print("Test finished, test results saved to .npy file at ", save_dir)
     print(indices)
 
-    # QIstr = '/home/zhangmj/hyperspectralSR/CEGATSR/test_log/' + model_title + '_' + str(time.ctime()) + ".txt"
-    QIstr = '/home/zhangmj/hyperspectralSR/CEGATSR/shiyan_log/' + model_title + '_' + str(time.ctime()) + ".txt"
+
+    QIstr = '/home/hyperspectralSR/CEGATSR/shiyan_log/' + model_title + '_' + str(time.ctime()) + ".txt"
     json.dump(indices, open(QIstr, 'w'))
 
 
@@ -329,8 +326,8 @@ def test(args):
         channels = 128
 
     print('===> Loading testset')
-    test_path = '/home/zhangmj/hyperspectralSR/CEGATSR/mcodes/dataset/sspsr/' + args.dataset_name + '_x' + str(args.n_scale) + '/tests/'
-    result_path = '/home/zhangmj/hyperspectralSR/CEGATSR/mcodes/dataset/sspsr/' + args.dataset_name + '_x' + str(args.n_scale) + '/results/'
+    test_path = '/home/hyperspectralSR/CEGATSR/mcodes/dataset/sspsr/' + args.dataset_name + '_x' + str(args.n_scale) + '/tests/'
+    result_path = '/home/hyperspectralSR/CEGATSR/mcodes/dataset/sspsr/' + args.dataset_name + '_x' + str(args.n_scale) + '/results/'
     test_set = HSTestData(image_dir=test_path)
     test_loader = DataLoader(test_set, batch_size=1, shuffle=False)
     # train_loader = DataLoader(result_path, batch_size=3, shuffle=False)
@@ -340,8 +337,8 @@ def test(args):
     # loading model
 
     print('===> Loading Model')
-    # model_name = '/home/zhangmj/hyperspectralSR/CEGATSR/trained_model/CAVE_x4_CEGATSR_Blocks=8_Subs4_Ovls1_Feats=128_epoch_100_Fri_Sep__3_05:41:24_2021.pth'
-    model_name = '/home/zhangmj/hyperspectralSR/CEGATSR/shiyan_model/SSPSREXP_Harvard_x4_CEGATSRdsbzuizhonglinghuo26lossgraspe_Blocks=6_Subs4_Ovls0_Feats1=64_Feats2=64_B_Block=1_LSK1=15_LSK2=15_PKS1=3_PR1=4_PKS2=3_PR2=4_epoch_60_Wed_Jun_19_07:51:02_2024.pth'
+    # model_name = '/home/hyperspectralSR/CEGATSR/trained_model/CAVE_x4_CEGATSR_Blocks=8_Subs4_Ovls1_Feats=128_epoch_100_Fri_Sep__3_05:41:24_2021.pth'
+    model_name = '/home/hyperspectralSR/CEGATSR/shiyan_model/SSPSREXP_Harvard_x4_CEGATSRdsbzuizhonglinghuo26lossgraspe_Blocks=6_Subs4_Ovls0_Feats1=64_Feats2=64_B_Block=1_LSK1=15_LSK2=15_PKS1=3_PR1=4_PKS2=3_PR2=4_epoch_60_Wed_Jun_19_07:51:02_2024.pth'
     # model = CEGATSR(n_subs=n_subs, n_ovls=n_ovls, in_feats=channels, n_blocks=n_blocks, out_feats=out_feats, n_scale=n_scale, res_scale=0.1, use_share=True, conv=default_conv)
     model = LSKfenzu22(n_subs=args.n_subs, n_ovls=args.n_ovls, in_feats=channels, b_blocks=args.b_blocks,n_blocks=args.n_blocks, out_feats=args.out_feats, n_scale=args.n_scale, res_scale=0.1, use_share=args.use_share, conv=default_conv, )
     # model.eval().cuda()
@@ -388,16 +385,14 @@ def test(args):
         for index in indices:
             indices[index] = indices[index] / test_number
 
-    # save_dir = "/data/test.npy"
-    # save_dir = result_path + model_title + '.npy'
-    # save_dir = '/home/zhangmj/hyperspectralSR/CEGATSR/test_log/' + model_title + '.npy'
-    save_dir = '/home/zhangmj/hyperspectralSR/CEGATSR/shiyan_log/' + model_title + '.npy'
+
+    save_dir = '/home/hyperspectralSR/CEGATSR/shiyan_log/' + model_title + '.npy'
     np.save(save_dir, output)
     print("Test finished, test results saved to .npy file at ", save_dir)
     print(indices)
 
-    # QIstr = '/home/zhangmj/hyperspectralSR/CEGATSR/test_log/' + model_title + '_' + str(time.ctime()) + ".txt"
-    QIstr = '/home/zhangmj/hyperspectralSR/CEGATSR/shiyan_log/' + model_title + '_' + str(time.ctime()) + ".txt"
+
+    QIstr = '/home/hyperspectralSR/CEGATSR/shiyan_log/' + model_title + '_' + str(time.ctime()) + ".txt"
     json.dump(indices, open(QIstr, 'w'))
 
 

@@ -10,7 +10,7 @@ import pdb
 from bsrnutils import Conv2d1x1, Conv2d3x3, CCA,  DepthwiseSeparableConv2d,PixelMixer
 import torch.nn.functional as f
 
-# 前BSRN+后LSK(MLP)
+
 
 
 class ShiftConv2d1x1(nn.Conv2d):
@@ -396,73 +396,7 @@ class ProcessLayer_Graph(nn.Module):
         return y
 
 
-# class GCN_Unit(nn.Module):  #gab
-#     def __init__(self, in_feats, out_feats):
-#         super(GCN_Unit, self).__init__()
-#         kernel_size = 3
-#         stride = 2
-#         n_heads = 2
-#         dropout = 0.6
-#         alpha = 0.2
-#         self.head = Pre_ProcessLayer_Graph(in_feats, out_feats, kernel_size, stride, bias=True)
-#         self.body = GAT(out_feats, out_feats, dropout, alpha, n_heads)
-#         # self.body = nn.Conv2d(out_feats, out_feats, kernel_size, stride=1, padding=kernel_size // 2, bias=True)
-#         self.last = ProcessLayer_Graph(out_feats, out_feats, kernel_size, stride, bias=True)
-#
-#         self.Act = nn.ReLU()
-#
-#     def forward(self, x):
-#         y, adj = self.head(x)       # y.shape = torch.Size([16, 64, 32]), adj.shape = torch.Size([16, 64, 64])
-#         y = self.body(y, adj)       # y.shape = torch.Size([16, 64, 32])
-#         # y = self.body(y)       # y.shape = torch.Size([16, 64, 32])
-#         y = y.permute(0,2,1).contiguous()           # [B,N,C]->[B,C,N]
-#         [B,C,N] = y.shape
-#         H = int(math.sqrt(N))
-#         W = int(math.sqrt(N))
-#         y = torch.reshape(y,[B,C,H,W])
-#         # print("reshape later:y.shape:", y.shape)     # torch.Size([16, 64, 8, 8])
-#         y = self.last(y)        # GCN branch channel is "out_feats".
-#         # print("transconv:y.shape:", y.shape)     # torch.Size([16, 64, 16, 16])
-#         # pdb.set_trace()
-#         return y
 
-
-# class CNN_Unit(nn.Module): #dscb
-#     def __init__(self, in_feats, out_feats, kernel_size=3):
-#         super(CNN_Unit, self).__init__()
-#         self.point_conv = nn.Conv2d(
-#             in_channels=in_feats,
-#             out_channels=out_feats,
-#             kernel_size=1,
-#             stride=1,
-#             padding=0,
-#             groups=1,
-#             bias=False
-#         )
-#         self.depth_conv = nn.Conv2d(
-#             in_channels=out_feats,
-#             out_channels=out_feats,
-#             kernel_size=kernel_size,
-#             stride=1,
-#             padding=kernel_size // 2,
-#             groups=out_feats
-#         )
-#         self.Act1 = nn.LeakyReLU()
-#         self.Act2 = nn.LeakyReLU()
-#         self.BN = nn.BatchNorm2d(in_feats)
-#
-#     def forward(self, x):
-#         # y = self.point_conv(self.BN(x)
-#         y = self.point_conv(x)
-#         y = self.Act1(y)
-#         y = self.depth_conv(y)
-#         y = self.Act2(y)
-#
-#         y = self.point_conv(y)
-#         y = self.Act1(y)
-#         y = self.depth_conv(y)
-#         y = self.Act2(y)
-#         return y
 
 
 class GCN_CNN_Unit(nn.Module):          # GCN_CNN_Unit
@@ -527,14 +461,7 @@ class GCN_CNN_Unit2(nn.Module):          # GCN_CNN_Unit
         # pdb.set_trace()
         return y
 
-# class SSB(nn.Module):                   # SSB  Global spatial-spectral unit
-#     def __init__(self, in_feats, kernel_size, act, res_scale, conv=default_conv):
-#         super(SSB, self).__init__()
-#         self.spa = SpatialResBlock(conv, in_feats, kernel_size, act=act, res_scale=res_scale)
-#         self.spc = SpectralAttentionResBlock(conv, in_feats, 1, act=act, res_scale=res_scale)
-#
-#     def forward(self, x):
-#         return self.spc(self.spa(x))
+
 
 
 class SSPN(nn.Module): #后头的那块
@@ -637,7 +564,6 @@ class LSKfenzu22(nn.Module):
 
             xi = x[:, sta_ind:end_ind, :, :]
             # print(xi.size())
-            # xi：那部分波段对应的tensor
             if self.shared:
                 xi = self.branch(xi)
             else:
@@ -646,16 +572,13 @@ class LSKfenzu22(nn.Module):
             # print("sta_ind=:",sta_ind)
             # print("end_ind=:",end_ind)
 
-            # 输出经过上采样后的东西，放进相应的y里面
             y[:, sta_ind:end_ind, :, :] += xi
             channel_counter[sta_ind:end_ind] = channel_counter[sta_ind:end_ind] + 1
 
-            # print(channel_counter[sta_ind:end_ind].size()) #输出的是分组形式的tensor，一组多少就是几维(只是通道的那一维)
-            #把对应波段处理的数据直接塞入原来对应的波段中，就已经算是在concat了
 
 
-        # print(channel_counter) #这个东西是对应每个波段的权重（31个c通道权重）,然后unsqueeze后扩维才能被y除
-        # intermediate “result” is averaged according to their spectral indices
+
+
         y = y / channel_counter.unsqueeze(1).unsqueeze(2)
         # print(y)
         # pdb.set_trace()

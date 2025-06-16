@@ -325,7 +325,7 @@ class Totalgroup(nn.Module):          # Totalgroup
 #         return self.spc(self.spa(x))
 
 
-class SSPN(nn.Module): #后头的那块
+class SSPN(nn.Module):
     def __init__(self, out_feats2,largeks2,pks2,pratio2, n_blocks, act, res_scale):
         super(SSPN, self).__init__()
 
@@ -395,8 +395,7 @@ class EFGN(nn.Module):
         self.start_idx = []
         self.end_idx = []
         print("G=",self.G)
-        # 分组是分重叠组
-        # g：分g组  n_subs：一组多少个波段  n_ovls：控制重合度 sta_ind：某一组的起始波段数 end_ind：某一组终止的波段数
+
         for g in range(self.G):
             sta_ind = (n_subs - n_ovls) * g
             end_ind = sta_ind + n_subs
@@ -418,7 +417,7 @@ class EFGN(nn.Module):
 
 
 
-        # trunk：后面那一块
+
         self.trunk = Spatial_Spectral_Unit(in_feats, out_feats2,largeks2,pks2,pratio2,  n_blocks, act, res_scale, up_scale=2, use_tail=False, conv=default_conv)
         self.skip_conv = conv(in_feats, out_feats2, kernel_size)
         self.final = conv(out_feats2, in_feats, kernel_size)
@@ -446,7 +445,7 @@ class EFGN(nn.Module):
             end_ind = self.end_idx[g]
             xi = self.process(torch.cat([x[:, sta_ind:end_ind, :, :], xi2, xi3], dim=1))
             # print(xi.size())
-            # xi：那部分波段对应的tensor
+
             if self.shared:
                 xi1, xi2,xi3 = self.branch(xi)
 
@@ -471,10 +470,9 @@ class EFGN(nn.Module):
             channel_counter[sta_ind:end_ind] = channel_counter[sta_ind:end_ind] + 1
 
 
-            # print(channel_counter[sta_ind:end_ind].size()) #输出的是分组形式的tensor，一组多少就是几维(只是通道的那一维)
-            # 把对应波段处理的数据直接塞入原来对应的波段中，就已经算是在concat了
+            # print(channel_counter[sta_ind:end_ind].size())
 
-        # print(channel_counter) #这个东西是对应每个波段的权重（31个c通道权重）,然后unsqueeze后扩维才能被y除
+
         # intermediate “result” is averaged according to their spectral indices
         y = y / channel_counter.unsqueeze(1).unsqueeze(2)
         # print(y)

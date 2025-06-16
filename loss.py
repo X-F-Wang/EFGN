@@ -83,7 +83,7 @@ class HLoss(torch.nn.Module):
         loss = loss1 + loss2 + loss3
         return loss
 
-#原本(l1+sstv)+spe
+
 class HLoss2(torch.nn.Module):
     def __init__(self, la1, la2, sam=True, gra=True,spatial_tv=True, spectral_tv=True):
         super(HLoss2, self).__init__()
@@ -115,7 +115,7 @@ class HLoss2(torch.nn.Module):
         loss = loss1 + loss2 + spatial_TV+spectral_TV
         return loss
 
-#原本(l1+sstv)+gra
+
 class HLoss3(torch.nn.Module):
     def __init__(self, la1, la2, sam=True, gra=True, spatial_tv=True, spectral_tv=True):
         super(HLoss3, self).__init__()
@@ -147,7 +147,7 @@ class HLoss3(torch.nn.Module):
         loss = loss1  + loss3 + spatial_TV + spectral_TV
         return loss
 
-#原本(l1+sstv)+spe+gra
+
 class HLoss5(torch.nn.Module):
     def __init__(self, la1, la2, sam=True, gra=True, spatial_tv=True, spectral_tv=True):
         super(HLoss5, self).__init__()
@@ -179,7 +179,7 @@ class HLoss5(torch.nn.Module):
         loss = loss1 + loss2 + loss3 + spatial_TV + spectral_TV
         return loss
 
-#l1+spe+gra
+
 class HLoss6(torch.nn.Module):
     def __init__(self, la1, la2, sam=True, gra=True, spatial_tv=True, spectral_tv=True):
         super(HLoss6, self).__init__()
@@ -211,8 +211,6 @@ class HLoss6(torch.nn.Module):
         loss = loss1 + loss2 + loss3
         return loss
 
-
-#l1+spe
 class HLoss7(torch.nn.Module):
     def __init__(self, la1, la2, sam=True, gra=True, spatial_tv=True, spectral_tv=True):
         super(HLoss7, self).__init__()
@@ -244,7 +242,7 @@ class HLoss7(torch.nn.Module):
         loss = loss1 + loss2
         return loss
 
-#l1+gra
+
 class HLoss8(torch.nn.Module):
     def __init__(self, la1, la2, sam=True, gra=True, spatial_tv=True, spectral_tv=True):
         super(HLoss8, self).__init__()
