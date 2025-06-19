@@ -165,9 +165,6 @@ def get_model_parameters_number(model):
 
 
 def add_flops_counting_methods(net_main_module):
-    # adding additional methods to the existing module object,
-    # this is done this way so that each function has access to self object
-    # embed()
     net_main_module.start_flops_count = start_flops_count.__get__(net_main_module)
     net_main_module.stop_flops_count = stop_flops_count.__get__(net_main_module)
     net_main_module.reset_flops_count = reset_flops_count.__get__(net_main_module)
@@ -258,8 +255,6 @@ def add_flops_counter_variable_or_reset(module):
     if is_supported_instance(module):
         module.__flops__ = 0
 
-
-# ---- Internal functions
 def is_supported_instance(module):
     if isinstance(module,
                   (
@@ -274,9 +269,6 @@ def is_supported_instance(module):
 
 
 def conv_flops_counter_hook(conv_module, input, output):
-    # Can have multiple inputs, getting the first one
-    # input = input[0]
-
     batch_size = output.shape[0]
     output_dims = list(output.shape[2:])
 
@@ -291,18 +283,13 @@ def conv_flops_counter_hook(conv_module, input, output):
     active_elements_count = batch_size * np.prod(output_dims)
     overall_conv_flops = int(conv_per_position_flops) * int(active_elements_count)
 
-    # overall_flops = overall_conv_flops
 
     conv_module.__flops__ += int(overall_conv_flops)
-    # conv_module.__output_dims__ = output_dims
 
 
 def relu_flops_counter_hook(module, input, output):
     active_elements_count = output.numel()
     module.__flops__ += int(active_elements_count)
-    # print(module.__flops__, id(module))
-    # print(module)
-
 
 def linear_flops_counter_hook(module, input, output):
     input = input[0]
@@ -315,12 +302,6 @@ def linear_flops_counter_hook(module, input, output):
 
 
 def bn_flops_counter_hook(module, input, output):
-    # input = input[0]
-    # TODO: need to check here
-    # batch_flops = np.prod(input.shape)
-    # if module.affine:
-    #     batch_flops *= 2
-    # module.__flops__ += int(batch_flops)
     batch = output.shape[0]
     output_dims = output.shape[2:]
     channels = module.num_features
@@ -330,11 +311,8 @@ def bn_flops_counter_hook(module, input, output):
     module.__flops__ += int(batch_flops)
 
 
-# ---- Count the number of convolutional layers and the activation
+
 def add_activation_counting_methods(net_main_module):
-    # adding additional methods to the existing module object,
-    # this is done this way so that each function has access to self object
-    # embed()
     net_main_module.start_activation_count = start_activation_count.__get__(net_main_module)
     net_main_module.stop_activation_count = stop_activation_count.__get__(net_main_module)
     net_main_module.reset_activation_count = reset_activation_count.__get__(net_main_module)
@@ -468,9 +446,6 @@ def dconv_flops_counter_hook(dconv_module, input, output):
 
     m_channels, in_channels, kernel_dim1, _, = dconv_module.weight.shape
     out_channels, _, kernel_dim2, _, = dconv_module.projection.shape
-    # groups = dconv_module.groups
-
-    # filters_per_channel = out_channels // groups
     conv_per_position_flops1 = kernel_dim1 ** 2 * in_channels * m_channels
     conv_per_position_flops2 = kernel_dim2 ** 2 * out_channels * m_channels
     active_elements_count = batch_size * np.prod(output_dims)
@@ -479,6 +454,5 @@ def dconv_flops_counter_hook(dconv_module, input, output):
     overall_flops = overall_conv_flops
 
     dconv_module.__flops__ += int(overall_flops)
-    # dconv_module.__output_dims__ = output_dims
 
 

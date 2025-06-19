@@ -30,7 +30,7 @@ resume = True
 
 log_interval = 50
 model_name = ''
-test_path = ''  # '/home/zhangmj/hyperspectralSR/CEGATSR/mcodes/dataset/sspsr/Chikusei_x4/Chikusei_test.mat'
+test_path = ''
 
 
 def main():
@@ -112,11 +112,11 @@ def train(args):
     # cudnn.benchmark = True        # RuntimeError: cuda runtime error (11) : invalid argument at /pytorch/aten/src/THC/THCGeneral.cpp:383
 
     print('===> Loading datasets')
-    train_path = '/home/zhangmj/hyperspectralSR/CEGATSR/mcodes/dataset/sspsr/' + args.dataset_name + '_x' + str(args.n_scale) + '/trains/'
-    test_path = '/home/zhangmj/hyperspectralSR/CEGATSR/mcodes/dataset/sspsr/' + args.dataset_name + '_x' + str(args.n_scale) + '/tests/'
-    eval_path = '/home/zhangmj/hyperspectralSR/CEGATSR/mcodes/dataset/sspsr/' + args.dataset_name + '_x' + str(args.n_scale) + '/evals/'
+    train_path = '/home/hyperspectralSR/CEGATSR/mcodes/dataset/sspsr/' + args.dataset_name + '_x' + str(args.n_scale) + '/trains/'
+    test_path = '/home/hyperspectralSR/CEGATSR/mcodes/dataset/sspsr/' + args.dataset_name + '_x' + str(args.n_scale) + '/tests/'
+    eval_path = '/home/hyperspectralSR/CEGATSR/mcodes/dataset/sspsr/' + args.dataset_name + '_x' + str(args.n_scale) + '/evals/'
 
-    result_path = '/home/zhangmj/hyperspectralSR/CEGATSR/mcodes/dataset/sspsr/' + args.dataset_name + '_x' + str(args.n_scale) + '/results/'
+    result_path = '/home/hyperspectralSR/CEGATSR/mcodes/dataset/sspsr/' + args.dataset_name + '_x' + str(args.n_scale) + '/results/'
 
     train_set = HSTrainingData(image_dir=train_path, augment=True)
     eval_set = HSTrainingData(image_dir=eval_path, augment=False)
@@ -146,8 +146,6 @@ def train(args):
     total2 = get_model_parameters_number(net)
     print('# parameters2:', total2)
 
-    # flops=get_model_flops(net,(128,64,64),(128,64,64),False)
-    # print('# Flops:', flops)
     if torch.cuda.device_count() > 1:
         print("===> Let's use", torch.cuda.device_count(), "GPUs.")
         net = torch.nn.DataParallel(net)
@@ -162,14 +160,10 @@ def train(args):
             print("=> no checkpoint found at '{}'".format(model_name))
     net.to(device).train()
 
-    # loss functions to choose
-    # mse_loss = torch.nn.MSELoss()
     h_loss = HLoss(0.5,0.1,spatial_tv=True, spectral_tv=True)
-    # hylap_loss = HyLapLoss(spatial_tv=False, spectral_tv=True)
     L1_loss = torch.nn.L1Loss()
 
     print("===> Setting optimizer and logger")
-    # add L2 regularization
     optimizer = Adam(net.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay)
     epoch_meter = meter.AverageValueMeter()
     writer = SummaryWriter('runs/' + model_title + '_' + str(time.ctime()))
@@ -181,9 +175,6 @@ def train(args):
         print("Start epoch {}, learning rate = {}".format(e + 1, optimizer.param_groups[0]["lr"]))
         for iteration, (x, lms, gt) in enumerate(train_loader): 
             x, lms, gt = x.to(device), lms.to(device), gt.to(device)
-            # print("x.shape:",x.shape)           # torch.Size([16, 31, 16, 16])
-            # print("lms.shape:",lms.shape)       # torch.Size([16, 31, 64, 64])
-            # print("gt.shape:",gt.shape)         # torch.Size([16, 31, 64, 64])
             optimizer.zero_grad()
             y = net(x, lms)
             loss = h_loss(y, gt)
@@ -204,17 +195,12 @@ def train(args):
                 writer.add_scalar('scalar/train_loss', loss, n_iter)
 
         print("===> {}\tEpoch {} Training Complete: Avg. Loss: {:.6f}".format(time.ctime(), e + 1, epoch_meter.value()[0]))
-        # run validation set every epoch
         eval_loss = validate(args, eval_loader, net, L1_loss)
-        # tensorboard visualization
         writer.add_scalar('scalar/avg_epoch_loss', epoch_meter.value()[0], e + 1)
         writer.add_scalar('scalar/avg_validation_loss', eval_loss, e + 1)
-        # save model weights at checkpoints every 10 epochs
         if (e + 1) % 5 == 0:
             save_checkpoint(args, net, e + 1)
 
-    # save model after training
-    # 感觉是多了下面这一行网络才不一样
     net.eval().cpu()
     save_model_filename = model_title + "_epoch_" + str(args.epochs) + "_" + \
                           str(time.ctime()).replace(' ', '_') + ".pth"
@@ -260,15 +246,11 @@ def train(args):
         for index in indices:
             indices[index] = indices[index] / test_number
 
-    # save_dir = "/data/test.npy"
-    # save_dir = model_title + '.npy'     # '/home/zhangmj/hyperspectralSR/CEGATSR/data/test/' + model_title + '.npy'
-    # save_dir = '/home/zhangmj/hyperspectralSR/CEGATSR/test_log/' + model_title + '.npy'
     save_dir = '/home/zhangmj/hyperspectralSR/CEGATSR/shiyan_log/' + model_title + '.npy'
     np.save(save_dir, output)
     print("Test finished, test results saved to .npy file at ", save_dir)
     print(indices)
 
-    # QIstr = '/home/zhangmj/hyperspectralSR/CEGATSR/test_log/' + model_title + '_' + str(time.ctime()) + ".txt"
     QIstr = '/home/zhangmj/hyperspectralSR/CEGATSR/shiyan_log/' + model_title + '_' + str(time.ctime()) + ".txt"
     json.dump(indices, open(QIstr, 'w'))
 
@@ -289,20 +271,17 @@ def adjust_learning_rate(start_lr, optimizer, epoch):
 
 def validate(args, loader, model, criterion):
     device = torch.device("cuda" if args.cuda else "cpu")
-    # switch to evaluate mode
     model.eval()
     epoch_meter = meter.AverageValueMeter()
     epoch_meter.reset()
     with torch.no_grad():
         for i, (ms, lms, gt) in enumerate(loader):
             ms, lms, gt = ms.to(device), lms.to(device), gt.to(device)
-            # y = model(ms)
             y = model(ms, lms)
             loss = criterion(y, gt)
             epoch_meter.add(loss.item())
         mesg = "===> {}\tEpoch evaluation Complete: Avg. Loss: {:.6f}".format(time.ctime(), epoch_meter.value()[0])
         print(mesg)
-    # back to training mode
     model.train()
     return epoch_meter.value()[0]
 
@@ -327,37 +306,25 @@ def test(args):
     result_path = '/home/zhangmj/hyperspectralSR/CEGATSR/mcodes/dataset/sspsr/' + args.dataset_name + '_x' + str(args.n_scale) + '/results/'
     test_set = HSTestData(image_dir=test_path)
     test_loader = DataLoader(test_set, batch_size=1, shuffle=False)
-    # train_loader = DataLoader(result_path, batch_size=3, shuffle=False)
     images_name = [x for x in listdir(test_path)]
     print('===> Start testing')
     model_title = "SSPSREXP_"+args.dataset_name + "_x" + str(args.n_scale) + "_" + str(args.out_feats1)+ "_" + str(args.out_feats2)
-    # loading model
 
     print('===> Loading Model')
-    # model_name = '/home/zhangmj/hyperspectralSR/CEGATSR/trained_model/CAVE_x4_CEGATSR_Blocks=8_Subs4_Ovls1_Feats=128_epoch_100_Fri_Sep__3_05:41:24_2021.pth'
     model_name = '/home/zhangmj/hyperspectralSR/CEGATSR/shiyan_model/SSPSREXP_Harvard_x4_EFGN_Blocks=6_Subs4_Ovls0_Feats1=64_Feats2=64_B_Block=1_LSK1=15_LSK2=15_PKS1=3_PR1=4_PKS2=3_PR2=4_epoch_60_Wed_Jun_19_07:51:02_2024.pth'
-    # model = CEGATSR(n_subs=n_subs, n_ovls=n_ovls, in_feats=channels, n_blocks=n_blocks, out_feats=out_feats, n_scale=n_scale, res_scale=0.1, use_share=True, conv=default_conv)
     model = EFGN(b_blocks=args.b_blocks,n_subs=args.n_subs, n_ovls=args.n_ovls, in_feats=channels, n_blocks=args.n_blocks, out_feats1=args.out_feats1,out_feats2=args.out_feats2,largeks1=args.largeks1,largeks2=args.largeks2,pks1=args.pks1,pratio1=args.pratio1,pks2=args.pks1,pratio2=args.pratio1, n_scale=args.n_scale, res_scale=0.1, use_share=args.use_share, conv=default_conv, )
-    # model.eval().cuda()
     model.eval().cpu()
-    # model.state_dict()
     with torch.no_grad():
         epoch_meter = meter.AverageValueMeter()
         epoch_meter.reset()
         state_dict = torch.load(model_name)
-        # print(state_dict)
         model.load_state_dict(state_dict,strict=False)
         model.to(device).eval()
         mse_loss = torch.nn.MSELoss()
         output = []
         test_number = 0
         for i, (ms, lms, gt) in enumerate(test_loader):
-            # compute output
             ms, lms, gt = ms.to(device), lms.to(device), gt.to(device)
-            # print("ms.shape:", ms.shape)        # torch.Size([1, 31, 32, 32])
-            # print("lms.shape:", lms.shape)      # torch.Size([1, 31, 128, 128])
-            # pdb.set_trace()
-            # y = model(ms)
             y = model(ms, lms)
             y, gt = y.squeeze().cpu().numpy().transpose(1, 2, 0), gt.squeeze().cpu().numpy().transpose(1, 2, 0)
             y = y[:gt.shape[0], :gt.shape[1], :]
@@ -377,21 +344,15 @@ def test(args):
             data22={'pred': y11, 'gt': gt11, 'ms_bicubic': lms11}
 
             sio.savemat(result_path + images_name[i], data22)
-
-            # sio.savemat(result_path + images_name[i], {'pred': y, 'gt': gt, 'ms_bicubic': lms})
         for index in indices:
             indices[index] = indices[index] / test_number
 
-    # save_dir = "/data/test.npy"
-    # save_dir = result_path + model_title + '.npy'
-    # save_dir = '/home/zhangmj/hyperspectralSR/CEGATSR/test_log/' + model_title + '.npy'
-    save_dir = '/home/zhangmj/hyperspectralSR/CEGATSR/shiyan_log/' + model_title + '.npy'
+    save_dir = '/home/hyperspectralSR/CEGATSR/shiyan_log/' + model_title + '.npy'
     np.save(save_dir, output)
     print("Test finished, test results saved to .npy file at ", save_dir)
     print(indices)
 
-    # QIstr = '/home/zhangmj/hyperspectralSR/CEGATSR/test_log/' + model_title + '_' + str(time.ctime()) + ".txt"
-    QIstr = '/home/zhangmj/hyperspectralSR/CEGATSR/shiyan_log/' + model_title + '_' + str(time.ctime()) + ".txt"
+    QIstr = '/home/hyperspectralSR/CEGATSR/shiyan_log/' + model_title + '_' + str(time.ctime()) + ".txt"
     json.dump(indices, open(QIstr, 'w'))
 
 

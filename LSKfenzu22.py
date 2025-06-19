@@ -97,15 +97,13 @@ class BlueprintSeparableConv(torch.nn.Module):
                  mid_channels: int = None, **kwargs) -> None:
         super(BlueprintSeparableConv, self).__init__()
 
-        # pointwise
-        if mid_channels is not None:  # BSConvS
+        if mid_channels is not None:
             self.pw = nn.Sequential(Conv2d1x1(in_channels, mid_channels, bias=False),
                                     Conv2d1x1(mid_channels, out_channels, bias=False))
 
-        else:  # BSConvU
+        else:
             self.pw = Conv2d1x1(in_channels, out_channels, bias=False)
 
-        # depthwise
         self.dw = torch.nn.Conv2d(in_channels=out_channels, out_channels=out_channels, kernel_size=kernel_size,
                                   stride=stride, padding=padding, dilation=dilation, groups=out_channels,
                                   bias=bias)
@@ -126,14 +124,6 @@ class TokenMixer(nn.Module):
 
 
 class ESA(nn.Module):
-    r"""Enhanced Spatial Attention.
-
-    Args:
-        in_channels:
-        planes:
-        num_conv: Number of conv layers in the conv group
-
-    """
 
     def __init__(self, in_channels, planes: int = None, num_conv: int = 3, conv_layer=BlueprintSeparableConv,
                  **kwargs) -> None:
@@ -154,22 +144,15 @@ class ESA(nn.Module):
         self.tail_conv = Conv2d1x1(planes, in_channels)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # Conv-1
         head_output = self.head_conv(x)
 
-        # Stride Conv
         stride_output = self.stride_conv(head_output)
-        # Pooling
         pool_output = f.max_pool2d(stride_output, kernel_size=7, stride=3)
-        # Conv Group
         group_output = self.group_conv(pool_output)
-        # Upsampling
         upsample_output = f.interpolate(group_output, (x.size(2), x.size(3)),
                                         mode='bilinear', align_corners=False)
 
-        # Conv-1
         tail_output = self.tail_conv(upsample_output + self.useless_conv(head_output))
-        # Sigmoid
         sig_output = torch.sigmoid(tail_output)
 
         return x * sig_output
@@ -178,9 +161,6 @@ class ESA(nn.Module):
 
 
 class ESDB(nn.Module):
-    r"""Efficient Separable Distillation Block
-    """
-
     def __init__(self, planes: int, distillation_rate: float = 0.5,
                  ) -> None:
         super(ESDB, self).__init__()
@@ -250,15 +230,6 @@ class Conv2d3x3(nn.Conv2d):
 
 
 class LayerNorm4D(nn.Module):
-    r"""LayerNorm for 4D input.
-
-    Modified from https://github.com/sail-sg/poolformer.
-
-    Args:
-        num_channels (int): Number of channels expected in input
-        eps (float): A value added to the denominator for numerical stability. Default: 1e-5
-
-    """
 
     def __init__(self, num_channels: int, eps: float = 1e-5):
         super().__init__()
@@ -268,13 +239,6 @@ class LayerNorm4D(nn.Module):
         self.eps = eps
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        r"""
-        Args:
-            x: b c h w
-
-        Returns:
-            b c h w -> b c h w
-        """
         u = x.mean(1, keepdim=True)
         s = (x - u).pow(2).mean(1, keepdim=True)
         x = (x - u) / torch.sqrt(s + self.eps)
@@ -297,16 +261,6 @@ class TransLayermul(nn.Module):
         return res
 
 class MLP4D(nn.Module):
-    r"""Multi-layer perceptron for 4D input.
-
-    Args:
-        in_features: Number of input channels
-        hidden_features:
-        out_features: Number of output channels
-        act_layer:
-
-    """
-
     def __init__(self, in_features: int, hidden_features: int = None,
                  out_features: int = None, act_layer: nn.Module = nn.GELU) -> None:
         super().__init__()
@@ -317,10 +271,6 @@ class MLP4D(nn.Module):
         self.fc2 = ShiftConv2d1x1(hidden_features, out_features, bias=True)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        r"""
-        Args:
-            x: b c h w
-        """
         x = self.fc1(x)
         x = self.act(x)
         x = self.fc2(x)
@@ -331,9 +281,6 @@ class TransLayer(nn.Module):
     def __init__(self, planes: int, ) -> None:
         super().__init__()
         self.esdb = ESDB(planes)
-
-        # self.mlp = MLP4D(planes, planes * 2, act_layer=act_layer)
-        # self.norm2 = LayerNorm4D(planes)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = x + self.esdb(x)
@@ -347,9 +294,6 @@ class TransLayer2(nn.Module):
 
         self.mlp = MLP4D(planes, planes * 2, )
         self.norm2 = LayerNorm4D(planes)
-
-        # self.mlp = MLP4D(planes, planes * 2, act_layer=act_layer)
-        # self.norm2 = LayerNorm4D(planes)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = x + self.lsk(self.norm1(x))
@@ -368,21 +312,18 @@ class Pre_ProcessLayer_Graph(nn.Module):
 
     def forward(self, x):
         x = self.head(x)
-        # print("conv.shape:", x.shape)
         [B, C, H, W] = x.shape
         y = torch.reshape(x, [B, C, H*W])
         N = H*W
-        y = y.permute(0,2,1).contiguous()                # [B,C,N]->[B,N,C]
-        adj = torch.zeros(B, N, N).cuda()                # adj:[N, N], 1 or 0
+        y = y.permute(0,2,1).contiguous()
+        adj = torch.zeros(B, N, N).cuda()
         k = 9
         for b in range(B):
             dist = cdist(y[b,:,:].cpu().detach().numpy(), y[b,:,:].cpu().detach().numpy(), metric='euclidean')
-            # dist = dist + sp.eye(dist.shape[0])
-            dist = np.where(dist.argsort(1).argsort(1) <= 6, 1, 0)        # k=9 + itself, all = 10, the largest 10 number is 1, rest is 0. 
+            dist = np.where(dist.argsort(1).argsort(1) <= 6, 1, 0)
             dist = torch.from_numpy(dist).type(torch.FloatTensor)
             dist = torch.unsqueeze(dist, 0)
             adj[b,:,:] = dist
-        # y = y.permute(0,2,1).contiguous()       # [B,N,C]->[B,C,N]
         return y, adj
 
 
@@ -399,13 +340,12 @@ class ProcessLayer_Graph(nn.Module):
 
 
 
-class GCN_CNN_Unit(nn.Module):          # GCN_CNN_Unit
-    def __init__(self, b_blocks,in_feats, out_feats, up_scale, use_tail=True, conv=default_conv, ):  # up_scale
+class GCN_CNN_Unit(nn.Module):
+    def __init__(self, b_blocks,in_feats, out_feats, up_scale, use_tail=True, conv=default_conv, ):
         super(GCN_CNN_Unit, self).__init__()
         kernel_size = 3
         self.pre = conv(in_feats, out_feats, kernel_size)
         self.head = TransLayermul(out_feats,b_blocks)
-        # self.body = CNN_Unit(out_feats, out_feats)
         self.last = conv(out_feats, out_feats, kernel_size)
         self.upsample = Upsampler(conv, up_scale, out_feats)
         self.tail = True
@@ -413,58 +353,33 @@ class GCN_CNN_Unit(nn.Module):          # GCN_CNN_Unit
             self.tail = conv(out_feats, in_feats, kernel_size)
 
     def forward(self, x):
-        # print("unit in_feats:",x.shape)
         y = self.pre(x)
         GCN_result = self.head(y)
-        # print("GCN_result.shape:",GCN_result.shape)         # torch.Size([16, 64, 16, 16])
-        # CNN_result = self.body(y)
-        # print("CNN_result.shape:",CNN_result.shape)         # torch.Size([16, 64, 16, 16])
-        # pdb.set_trace()
-        # y = torch.cat([GCN_result, CNN_result], dim=1)
         y = GCN_result
         y = self.last(y)
-        # print("channel compress:", y.shape)     # torch.Size([16, 64, 16, 16])
         y = self.upsample(y)
-        # print("upscale:", y.shape)      # torch.Size([16, 16, 32, 32])
         if self.tail is not None:
             y = self.tail(y)
-            # print("reconstruct:",y.shape)    # torch.Size([16, 4, 32, 32])cave
-        # pdb.set_trace()
         return y
 
-class GCN_CNN_Unit2(nn.Module):          # GCN_CNN_Unit
-    def __init__(self,  out_feats, up_scale, use_tail=False, conv=default_conv):  # up_scale
+class GCN_CNN_Unit2(nn.Module):
+    def __init__(self,  out_feats, up_scale, use_tail=False, conv=default_conv):
         super(GCN_CNN_Unit2, self).__init__()
         kernel_size = 3
-        # self.pre = conv( out_feats, out_feats, kernel_size)
         self.head = TransLayer2(out_feats)
-        # self.body = CNN_Unit(out_feats, out_feats)
-        # self.last = conv(out_feats, out_feats, kernel_size)
 
 
 
 
     def forward(self, x):
-        # print("unit in_feats:",x.shape)
-
         GCN_result = self.head(x)
-        # print("GCN_result.shape:",GCN_result.shape)         # torch.Size([16, 64, 16, 16])
-        # CNN_result = self.body(y)
-        # print("CNN_result.shape:",CNN_result.shape)         # torch.Size([16, 64, 16, 16])
-        # pdb.set_trace()
-        # y = torch.cat([GCN_result, CNN_result], dim=1)
         y = GCN_result
-        # print("channel compress:", y.shape)     # torch.Size([16, 64, 16, 16])
-
-        # print("upscale:", y.shape)      # torch.Size([16, 16, 32, 32])
-
-        # pdb.set_trace()
         return y
 
 
 
 
-class SSPN(nn.Module): #后头的那块
+class SSPN(nn.Module):
     def __init__(self, out_feats, n_blocks, act, res_scale):
         super(SSPN, self).__init__()
 
@@ -483,7 +398,7 @@ class SSPN(nn.Module): #后头的那块
         return res
 
 
-class Spatial_Spectral_Unit(nn.Module): # Spatial_Spectral_Unit
+class Spatial_Spectral_Unit(nn.Module):
     def __init__(self, in_feats, out_feats, n_blocks, act, res_scale, up_scale, use_tail=False, conv=default_conv):
         super(Spatial_Spectral_Unit, self).__init__()
         kernel_size = 3
@@ -512,38 +427,24 @@ class LSKfenzu22(nn.Module):
         self.shared = use_share
         act = nn.ReLU(True)
 
-        # conv_layer = BlueprintSeparableConv
-        # calculate the group number (the number of branch networks)（分支的数量）
         self.G = math.ceil((in_feats - n_ovls) / (n_subs - n_ovls))
-        # calculate group indices
         self.start_idx = []
         self.end_idx = []
-        # print("G=",self.G)
-        # 分组是分重叠组
-        # g：分g组  n_subs：一组多少个波段  n_ovls：控制重合度 sta_ind：某一组的起始波段数 end_ind：某一组终止的波段数
         for g in range(self.G):
             sta_ind = (n_subs - n_ovls) * g
             end_ind = sta_ind + n_subs
             if end_ind > in_feats:
                 end_ind = in_feats
                 sta_ind = in_feats - n_subs
-            self.start_idx.append(sta_ind)      # [0, 6, 12, 18, 24, 30, 36, 42, 48, 54, 60, 66, 72, 78, 84, 90, 96, 102, 108, 114, 120]
-            self.end_idx.append(end_ind)        # [8, 14, 20, 26, 32, 38, 44, 50, 56, 62, 68, 74, 80, 86, 92, 98, 104, 110, 116, 122, 128]
+            self.start_idx.append(sta_ind)
+            self.end_idx.append(end_ind)
 
         if self.shared:
             self.branch = GCN_CNN_Unit(b_blocks,n_subs, out_feats, up_scale=n_scale//2, use_tail=True, conv=default_conv)
-            # self.branch = GCN_CNN_Unit(n_subs, out_feats, use_tail=True, conv=default_conv)
-            # up_scale=n_scale//2 means that we upsample the LR input n_scale//2 at the branch network, and then conduct 2 times upsampleing at the global network
         else:
             self.branch = nn.ModuleList
             for i in range(self.G):
                 self.branch.append(GCN_CNN_Unit(n_subs, out_feats, up_scale=n_scale//2, use_tail=True, conv=default_conv))
-                # self.branch.append(GCN_CNN_Unit(n_subs, out_feats, use_tail=True, conv=default_conv))
-
-
-
-
-        # trunk：后面那一块
         self.trunk = Spatial_Spectral_Unit(in_feats, out_feats, n_blocks, act, res_scale, up_scale=2, use_tail=False, conv=default_conv)
         self.skip_conv = conv(in_feats, out_feats, kernel_size)
         self.final = conv(out_feats, in_feats, kernel_size)
@@ -552,25 +453,20 @@ class LSKfenzu22(nn.Module):
     def forward(self, x, lms):
         b, c, h, w = x.shape
 
-        # Initialize intermediate “result”, which is upsampled with n_scale//2 times
         y = torch.zeros(b, c, self.sca * h, self.sca * w).cuda()
 
         channel_counter = torch.zeros(c).cuda()
-        # print(channel_counter)
         for g in range(self.G):
             sta_ind = self.start_idx[g]
 
             end_ind = self.end_idx[g]
 
             xi = x[:, sta_ind:end_ind, :, :]
-            # print(xi.size())
             if self.shared:
                 xi = self.branch(xi)
             else:
                 xi = self .branch[g](xi)
                 print("xi.shape:", xi.shape)
-            # print("sta_ind=:",sta_ind)
-            # print("end_ind=:",end_ind)
 
             y[:, sta_ind:end_ind, :, :] += xi
             channel_counter[sta_ind:end_ind] = channel_counter[sta_ind:end_ind] + 1
@@ -580,8 +476,6 @@ class LSKfenzu22(nn.Module):
 
 
         y = y / channel_counter.unsqueeze(1).unsqueeze(2)
-        # print(y)
-        # pdb.set_trace()
         y = self.trunk(y)
         y = y + self.skip_conv(lms)
         y = self.final(y)

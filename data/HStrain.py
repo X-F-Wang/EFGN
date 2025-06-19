@@ -38,14 +38,14 @@ class HSTrainingData(data.Dataset):
         if self.augment:
             file_index = index // self.factor
             aug_num = int(index % self.factor)
-            # print(aug_num)
+
         load_dir = self.image_files[file_index]
         data = sio.loadmat(load_dir)
 
 
 
 
-        # print(load_dir)
+
 
 
         ms = np.array(data['ms'][...], dtype=np.float32)

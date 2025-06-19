@@ -19,18 +19,15 @@ from LSKfenzu22 import LSKfenzu22
 
 from common import *
 
-# loss
 from loss import HLoss5
-# from loss import HyLapLoss
 from metrics import quality_assessment
 
-# global settings
 resume = True
 
 
 log_interval = 50
 model_name = ''
-test_path = ''  # '/home/zhangmj/hyperspectralSR/CEGATSR/mcodes/dataset/sspsr/Chikusei_x4/Chikusei_test.mat'
+test_path = ''
 
 
 def main():
@@ -118,11 +115,11 @@ def train(args):
     # cudnn.benchmark = True        # RuntimeError: cuda runtime error (11) : invalid argument at /pytorch/aten/src/THC/THCGeneral.cpp:383
 
     print('===> Loading datasets')
-    train_path = '/home/zhangmj/hyperspectralSR/CEGATSR/mcodes/dataset/sspsr/' + args.dataset_name + '_x' + str(args.n_scale) + '/trains/'
-    test_path = '/home/zhangmj/hyperspectralSR/CEGATSR/mcodes/dataset/sspsr/' + args.dataset_name + '_x' + str(args.n_scale) + '/tests/'
-    eval_path = '/home/zhangmj/hyperspectralSR/CEGATSR/mcodes/dataset/sspsr/' + args.dataset_name + '_x' + str(args.n_scale) + '/evals/'
+    train_path = '/home/hyperspectralSR/CEGATSR/mcodes/dataset/sspsr/' + args.dataset_name + '_x' + str(args.n_scale) + '/trains/'
+    test_path = '/home/hyperspectralSR/CEGATSR/mcodes/dataset/sspsr/' + args.dataset_name + '_x' + str(args.n_scale) + '/tests/'
+    eval_path = '/home/hyperspectralSR/CEGATSR/mcodes/dataset/sspsr/' + args.dataset_name + '_x' + str(args.n_scale) + '/evals/'
 
-    result_path = '/home/zhangmj/hyperspectralSR/CEGATSR/mcodes/dataset/sspsr/' + args.dataset_name + '_x' + str(args.n_scale) + '/results/'
+    result_path = '/home/hyperspectralSR/CEGATSR/mcodes/dataset/sspsr/' + args.dataset_name + '_x' + str(args.n_scale) + '/results/'
 
     train_set = HSTrainingData(image_dir=train_path, augment=True)
     eval_set = HSTrainingData(image_dir=eval_path, augment=False)
@@ -210,16 +207,12 @@ def train(args):
                 writer.add_scalar('scalar/train_loss', loss, n_iter)
 
         print("===> {}\tEpoch {} Training Complete: Avg. Loss: {:.6f}".format(time.ctime(), e + 1, epoch_meter.value()[0]))
-        # run validation set every epoch
         eval_loss = validate(args, eval_loader, net, L1_loss)
-        # tensorboard visualization
         writer.add_scalar('scalar/avg_epoch_loss', epoch_meter.value()[0], e + 1)
         writer.add_scalar('scalar/avg_validation_loss', eval_loss, e + 1)
-        # save model weights at checkpoints every 10 epochs
         if (e + 1) % 5 == 0:
             save_checkpoint(args, net, e + 1)
 
-    # save model after training
 
     net.eval().cpu()
     save_model_filename = model_title + "_epoch_" + str(args.epochs) + "_" + \
@@ -292,20 +285,17 @@ def adjust_learning_rate(start_lr, optimizer, epoch):
 
 def validate(args, loader, model, criterion):
     device = torch.device("cuda" if args.cuda else "cpu")
-    # switch to evaluate mode
     model.eval()
     epoch_meter = meter.AverageValueMeter()
     epoch_meter.reset()
     with torch.no_grad():
         for i, (ms, lms, gt) in enumerate(loader):
             ms, lms, gt = ms.to(device), lms.to(device), gt.to(device)
-            # y = model(ms)
             y = model(ms, lms)
             loss = criterion(y, gt)
             epoch_meter.add(loss.item())
         mesg = "===> {}\tEpoch evaluation Complete: Avg. Loss: {:.6f}".format(time.ctime(), epoch_meter.value()[0])
         print(mesg)
-    # back to training mode
     model.train()
     return epoch_meter.value()[0]
 
@@ -330,37 +320,25 @@ def test(args):
     result_path = '/home/hyperspectralSR/CEGATSR/mcodes/dataset/sspsr/' + args.dataset_name + '_x' + str(args.n_scale) + '/results/'
     test_set = HSTestData(image_dir=test_path)
     test_loader = DataLoader(test_set, batch_size=1, shuffle=False)
-    # train_loader = DataLoader(result_path, batch_size=3, shuffle=False)
     images_name = [x for x in listdir(test_path)]
     print('===> Start testing')
     model_title = "SSPSREXP_"+args.dataset_name + "_x" + str(args.n_scale) + "_" + str(args.out_feats1)+ "_" + str(args.out_feats2)
-    # loading model
 
     print('===> Loading Model')
-    # model_name = '/home/hyperspectralSR/CEGATSR/trained_model/CAVE_x4_CEGATSR_Blocks=8_Subs4_Ovls1_Feats=128_epoch_100_Fri_Sep__3_05:41:24_2021.pth'
     model_name = '/home/hyperspectralSR/CEGATSR/shiyan_model/SSPSREXP_Harvard_x4_CEGATSRdsbzuizhonglinghuo26lossgraspe_Blocks=6_Subs4_Ovls0_Feats1=64_Feats2=64_B_Block=1_LSK1=15_LSK2=15_PKS1=3_PR1=4_PKS2=3_PR2=4_epoch_60_Wed_Jun_19_07:51:02_2024.pth'
-    # model = CEGATSR(n_subs=n_subs, n_ovls=n_ovls, in_feats=channels, n_blocks=n_blocks, out_feats=out_feats, n_scale=n_scale, res_scale=0.1, use_share=True, conv=default_conv)
     model = LSKfenzu22(n_subs=args.n_subs, n_ovls=args.n_ovls, in_feats=channels, b_blocks=args.b_blocks,n_blocks=args.n_blocks, out_feats=args.out_feats, n_scale=args.n_scale, res_scale=0.1, use_share=args.use_share, conv=default_conv, )
-    # model.eval().cuda()
     model.eval().cpu()
-    # model.state_dict()
     with torch.no_grad():
         epoch_meter = meter.AverageValueMeter()
         epoch_meter.reset()
         state_dict = torch.load(model_name)
-        # print(state_dict)
         model.load_state_dict(state_dict,strict=False)
         model.to(device).eval()
         mse_loss = torch.nn.MSELoss()
         output = []
         test_number = 0
         for i, (ms, lms, gt) in enumerate(test_loader):
-            # compute output
             ms, lms, gt = ms.to(device), lms.to(device), gt.to(device)
-            # print("ms.shape:", ms.shape)        # torch.Size([1, 31, 32, 32])
-            # print("lms.shape:", lms.shape)      # torch.Size([1, 31, 128, 128])
-            # pdb.set_trace()
-            # y = model(ms)
             y = model(ms, lms)
             y, gt = y.squeeze().cpu().numpy().transpose(1, 2, 0), gt.squeeze().cpu().numpy().transpose(1, 2, 0)
             y = y[:gt.shape[0], :gt.shape[1], :]
@@ -381,7 +359,6 @@ def test(args):
 
             sio.savemat(result_path + images_name[i], data22)
 
-            # sio.savemat(result_path + images_name[i], {'pred': y, 'gt': gt, 'ms_bicubic': lms})
         for index in indices:
             indices[index] = indices[index] / test_number
 

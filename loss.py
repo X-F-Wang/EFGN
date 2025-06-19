@@ -276,7 +276,6 @@ class HLoss8(torch.nn.Module):
 
 
 
-# from https://github.com/jxgu1016/Total_Variation_Loss.pytorch with slight modifications
 class TVLoss(torch.nn.Module):
     def __init__(self, weight=1.0):
         super(TVLoss, self).__init__()
@@ -288,8 +287,6 @@ class TVLoss(torch.nn.Module):
         w_x = x.size()[3]
         count_h = self._tensor_size(x[:, :, 1:, :])
         count_w = self._tensor_size(x[:, :, :, 1:])
-        # h_tv = torch.abs(x[:, :, 1:, :] - x[:, :, :h_x - 1, :]).sum()
-        # w_tv = torch.abs(x[:, :, :, 1:] - x[:, :, :, :w_x - 1]).sum()
         h_tv = torch.pow((x[:, :, 1:, :] - x[:, :, :h_x - 1, :]), 2).sum()
         w_tv = torch.pow((x[:, :, :, 1:] - x[:, :, :, :w_x - 1]), 2).sum()
         return self.TVLoss_weight * (h_tv / count_h + w_tv / count_w) / batch_size
@@ -307,7 +304,6 @@ class TVLossSpectral(torch.nn.Module):
         batch_size = x.size()[0]
         c_x = x.size()[1]
         count_c = self._tensor_size(x[:, 1:, :, :])
-        # c_tv = torch.abs((x[:, 1:, :, :] - x[:, :c_x - 1, :, :])).sum()
         c_tv = torch.pow((x[:, 1:, :, :] - x[:, :c_x - 1, :, :]), 2).sum()
         return self.TVLoss_weight * 2 * (c_tv / count_c) / batch_size
 
